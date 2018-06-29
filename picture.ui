@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>picture</class>
+ <widget class="QMainWindow" name="picture">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>439</height>
+   </rect>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>picture</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>86</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="acceptDrops">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>86</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#scrollAreaWidgetContents
+{
+background-color:qlineargradient(spread:pad, x1:0.567568, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(94, 94, 94, 255))
+}</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>120</y>
+      <width>321</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="docklayout">
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton
+{	
+background-color:  rgba(135, 175, 255, 50);
+border-radius:20px;
+padding:2px;
+color:rgba(255,255,255,150);
+font:bold;
+}
+QPushButton:hover
+{	
+background-color: rgba(135, 175, 255,200);
+color:white;
+}
+QPushButton:checked
+{	
+	background-color: rgba(135, 175, 255,200);
+}</string>
+         </property>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton
+{	
+background-color:  rgba(135, 175, 255, 50);
+border-radius:20px;
+padding:2px;
+color:rgba(255,255,255,150);
+font:bold;
+}
+QPushButton:hover
+{	
+background-color: rgba(135, 175, 255,200);
+color:white;
+}
+QPushButton:checked
+{	
+	background-color: rgba(135, 175, 255,200);
+}</string>
+         </property>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>4</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>556</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="action"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>显示</string>
+    </property>
+    <addaction name="action_3"/>
+    <addaction name="action_5"/>
+    <addaction name="action_6"/>
+    <addaction name="action_2"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>切换图片</string>
+    </property>
+    <addaction name="action_4"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+    <widget class="QMenu" name="menuMade_by_noahsai">
+     <property name="title">
+      <string>Made by noahsai</string>
+     </property>
+     <addaction name="actionNoahsai_github_io_2"/>
+     <addaction name="actionGithub_com_noahsai"/>
+    </widget>
+    <addaction name="action_7"/>
+    <addaction name="action_8"/>
+    <addaction name="actionF11"/>
+    <addaction name="actionCTRL"/>
+    <addaction name="action_11"/>
+    <addaction name="separator"/>
+    <addaction name="menuMade_by_noahsai"/>
+   </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>旋转</string>
+    </property>
+    <addaction name="action_9"/>
+    <addaction name="action_10"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
+   <addaction name="menu_5"/>
+   <addaction name="menu_4"/>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>打开</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>界面等宽</string>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>界面等高</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>实际大小</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>全屏切换</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>到底部自动切换</string>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="text">
+    <string>← - 上一张</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+   <property name="priority">
+    <enum>QAction::NormalPriority</enum>
+   </property>
+  </action>
+  <action name="action_8">
+   <property name="text">
+    <string>→ - 下一张</string>
+   </property>
+  </action>
+  <action name="actionF11">
+   <property name="text">
+    <string>F11/双击 - 全屏切换</string>
+   </property>
+  </action>
+  <action name="actionCTRL">
+   <property name="text">
+    <string>CTRL+滚轮 - 缩放</string>
+   </property>
+  </action>
+  <action name="action_9">
+   <property name="text">
+    <string>顺时针</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="action_10">
+   <property name="text">
+    <string>逆时针</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionNoahsai_github_io">
+   <property name="text">
+    <string>noahsai.github.io</string>
+   </property>
+  </action>
+  <action name="actionNoahsai_github_io_2">
+   <property name="text">
+    <string>noahsai.github.io</string>
+   </property>
+  </action>
+  <action name="actionGithub_com_noahsai">
+   <property name="text">
+    <string>github.com/noahsai</string>
+   </property>
+  </action>
+  <action name="action_11">
+   <property name="text">
+    <string>自动切换需额外滚动4次</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
