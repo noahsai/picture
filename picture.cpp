@@ -1,6 +1,8 @@
 #include "picture.h"
 #include "ui_picture.h"
 
+void sort(QStringList& str);//文件名排序，解决自带排序出现1,10,11,2,3的问题，按1，2,3,10,11实际数字大小排序.
+
 picture::picture(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::picture)
@@ -12,7 +14,6 @@ picture::picture(QWidget *parent) :
     ui->scrollArea->setLayout(ui->docklayout);
     ui->pushButton->setVisible(false);
     ui->pushButton_2->setVisible(false);
-    imgScaled = new QImage;
     mod=0;
     pic=NULL;
     position=0;
@@ -25,6 +26,9 @@ picture::picture(QWidget *parent) :
     scale=100;
     upcount=0;
     downcount=0;
+    degree = 0.0;
+    rotateed = false;
+    isresize = false;
     timer.setSingleShot(true);
     read();
 
@@ -40,7 +44,6 @@ picture::picture(QWidget *parent,const QStringList& imglist) :
     ui->scrollArea->setLayout(ui->docklayout);
     ui->pushButton->setVisible(false);
     ui->pushButton_2->setVisible(false);
-    imgScaled = new QImage;
     mod=0;
     pic=NULL;
     position=0;
@@ -69,7 +72,6 @@ picture::picture(QWidget *parent,const QString& filename_or_dir) :
     ui->scrollArea->setLayout(ui->docklayout);
     ui->pushButton->setVisible(false);
     ui->pushButton_2->setVisible(false);
-    imgScaled = new QImage;
     mod=0;
     pic=NULL;
     position=0;
@@ -105,12 +107,10 @@ void picture::openafile(const QString &img)
     if(QFileInfo(img).isFile())
     {
         qDebug()<<img;
-
-        list.clear();
         list=img.split("/");
         list.removeLast();
         QString path=list.join("/");
-        getimglist(path);
+        getimglist(path);//里面会清空list，重置position和all
         getposition(img);
         openimg(img);
     }
@@ -125,8 +125,13 @@ void picture::openimg(const QString& img)
 {
     if(!img.isEmpty())
     {
-        pic=new QImage;
-        if(pic->load(img))
+        if(pic == NULL) pic = new QImage;
+        QMimeDatabase db;
+        QMimeType mime = db.mimeTypeForFile(img,QMimeDatabase::MatchContent	);  //
+        QString type = mime.name().split("/").takeLast();
+                qDebug()<<"Format:"<<img<<type;
+
+        if(pic->load(img,type.toLatin1()))
         {
             refresh();
         }
@@ -143,6 +148,7 @@ void picture::openimg(const QString& img)
 void picture::getimglist(const QString& path)
 {
     list.clear();
+    position = 0;
     QDirIterator someone(path,QDir::Files|QDir::NoSymLinks);
     while(someone.hasNext())
     {
@@ -155,8 +161,9 @@ void picture::getimglist(const QString& path)
         }
     }
     all=list.count()-1;
-    list.sort();
-    //qDebug()<<list;
+    //list.sort();
+    sort(list);
+    qDebug()<<list;
 }
 void picture::getposition(const QString& img)
 {
@@ -167,53 +174,79 @@ void picture::getposition(const QString& img)
     //qDebug()<<"position:"<<position;
 }
 
-void picture::on_action_3_triggered()
+
+void picture::on_action_width_toggled(bool arg1)
 {
+    if(!arg1) return;
     mod=0;
+    ui->action_height->setChecked(false);
+    ui->action_real->setChecked(false);
+
+    ui->action_width->setEnabled(false);//自锁
+    ui->action_height->setEnabled(true);
+    ui->action_real->setEnabled(true);
+
     if(pic)
     {
-        scale=newwidth*100/pic->width();
-        *imgScaled = pic->scaled(newwidth,pic->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        imgScaled = pic->scaled(newwidth,pic->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
         //qDebug()<<imgScaled->height()<<newheight<<pic->height();
-        if(imgScaled->height()>newheight)
+        if(imgScaled.height()>newheight)
         {
-            *imgScaled = pic->scaled(newwidth-15,pic->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+            scale = (newwidth- ui->scrollArea->verticalScrollBar()->width())*100/pic->width();//记录已缩放程度
+            imgScaled = pic->scaled(newwidth- ui->scrollArea->verticalScrollBar()->width(),pic->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
         }
-        ui->label->setPixmap(QPixmap::fromImage(*imgScaled));
+        ui->label->setPixmap(QPixmap::fromImage(imgScaled));
+        scale = imgScaled.width()*100/pic->width();//记录已缩放程度
 
     }
-
 }
 
 
-void picture::on_action_5_triggered()
+void picture::on_action_height_toggled(bool arg1)
 {
+    if(!arg1) return;
     mod=1;
+    ui->action_width->setChecked(false);
+    ui->action_real->setChecked(false);
+
+    ui->action_height->setEnabled(false);//自锁
+    ui->action_width->setEnabled(true);
+    ui->action_real->setEnabled(true);
+
     if(pic)
     {
-        scale=newwidth*100/pic->width();
-        *imgScaled = pic->scaled(pic->width(),newheight,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        imgScaled = pic->scaled(pic->width(),newheight,Qt::KeepAspectRatio,Qt::SmoothTransformation);
         //qDebug()<<imgScaled->width()<<newwidth<<pic->width();
-        if(imgScaled->width()>newwidth)
+        if(imgScaled.width()>newwidth)
         {
-            *imgScaled = pic->scaled(pic->width(),newheight-15,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+            imgScaled = pic->scaled(pic->width(),newheight-ui->scrollArea->horizontalScrollBar()->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
         }
-        ui->label->setPixmap(QPixmap::fromImage(*imgScaled));
-       // //qDebug()<<wid<<ui->label->width()<<imgScaled->width();
+        ui->label->setPixmap(QPixmap::fromImage(imgScaled));
+        scale = imgScaled.height()*100/pic->height();//记录已缩放程度
+
+       //qDebug()<<scale;
 
     }
-
 }
 
-void picture::on_action_6_triggered()
+
+void picture::on_action_real_toggled(bool arg1)
 {
+    if(!arg1) return;
     mod=2;
+    ui->action_width->setChecked(false);
+    ui->action_height->setChecked(false);
+
+    ui->action_real->setEnabled(false);//自锁
+    ui->action_height->setEnabled(true);
+    ui->action_width->setEnabled(true);
+
     if(pic)
     {
-        pic->load(list.at(position));
         ui->label->setPixmap(QPixmap::fromImage(*pic));
     }
 }
+
 
 void picture::resizeEvent(QResizeEvent *even)
 {
@@ -233,11 +266,12 @@ void picture::resizeEvent(QResizeEvent *even)
 
 void picture::refresh()
 {
+    scale = 100;//放在前面
     switch(mod)
     {
-    case 0:on_action_3_triggered();break;
-    case 1:on_action_5_triggered();break;
-    case 2:on_action_6_triggered();break;
+    case 0:on_action_width_toggled(true);break;
+    case 1:on_action_height_toggled(true);break;
+    case 2:on_action_real_toggled(true);break;
     default:break;
     }
     setWindowTitle(list.at(position).split("/").last());
@@ -322,16 +356,24 @@ void picture::nextimg()
         if(position<all)
         {
             position++;
-            pic->load(list.at(position));
-            refresh();
-            ui->scrollArea->verticalScrollBar()->setValue(0);
         }
         else if(position==all){
             position=0;
-            pic->load(list.at(position));
-            refresh();
-            ui->scrollArea->verticalScrollBar()->setValue(0);
+
         }
+        else return;
+
+        QMimeDatabase db;
+        QMimeType mime = db.mimeTypeForFile(list.at(position),QMimeDatabase::MatchContent	);  //
+        QString type = mime.name().split("/").takeLast();
+        qDebug()<<"Format:"<<img<<type;
+
+        pic->load(list.at(position),type.toLatin1());
+        if(rotateed && (degree!=0.0)){
+            rotate(degree);
+        }
+        refresh();
+        ui->scrollArea->verticalScrollBar()->setValue(0);
     }
 }
 
@@ -342,36 +384,44 @@ void picture::previmg()
         if(position>0)
         {
             position--;
-            pic->load(list.at(position));
-            refresh();
-
-
         }
         else if(position==0) {
             position=all;
-            pic->load(list.at(position));
-            refresh();
         }
+        else return;
+
+        QMimeDatabase db;
+        QMimeType mime = db.mimeTypeForFile(list.at(position),QMimeDatabase::MatchContent	);  //
+        QString type = mime.name().split("/").takeLast();
+        qDebug()<<"Format:"<<img<<type;
+
+        pic->load(list.at(position),type.toLatin1());
+        if(rotateed && (degree!=0.0)){
+            rotate(degree);
+        }
+        refresh();
     }
 }
 
 void picture::toscale()
 {
     disconnect(&timer , SIGNAL(timeout()),this , SLOT(timeout()));
-    *imgScaled = pic->scaled(pic->width()*(scale/100.0),pic->height()*(scale/100.0),Qt::KeepAspectRatio,Qt::FastTransformation);
-    ui->label->setPixmap(QPixmap::fromImage(*imgScaled));
+    imgScaled = pic->scaled(pic->width()*(scale/100.0),pic->height()*(scale/100.0),Qt::KeepAspectRatio,Qt::FastTransformation);
+    ui->label->setPixmap(QPixmap::fromImage(imgScaled));
     connect(&timer , SIGNAL(timeout()),this , SLOT(timeout()));
     timer.start(200);
 }
 
 void picture::timeout(){
-    qDebug()<<"time out"<<timer.isActive();
-    *imgScaled = pic->scaled(pic->width()*(scale/100.0),pic->height()*(scale/100.0),Qt::KeepAspectRatio,Qt::SmoothTransformation);
-    ui->label->setPixmap(QPixmap::fromImage(*imgScaled));
+    qDebug()<<"time out";//<<timer.isActive();
+    imgScaled = pic->scaled(pic->width()*(scale/100.0),pic->height()*(scale/100.0),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    ui->label->setPixmap(QPixmap::fromImage(imgScaled));
+    isresize = false;
 }
 
 bool picture::eventFilter(QObject *obj, QEvent *event)
 {
+
     if(pic)
     {
         if(obj==ui->scrollArea)
@@ -383,6 +433,7 @@ bool picture::eventFilter(QObject *obj, QEvent *event)
                mousey=press->pos().y();
                mousepress=true;
                setCursor(Qt::OpenHandCursor);
+               event->accept();
                return true;
 
             }
@@ -390,6 +441,7 @@ bool picture::eventFilter(QObject *obj, QEvent *event)
             {
                mousepress=false;
                setCursor(Qt::ArrowCursor);
+               event->accept();
                return true;
 
             }
@@ -411,6 +463,7 @@ bool picture::eventFilter(QObject *obj, QEvent *event)
 
                         mousex=press->pos().x();//移动中不断刷新mousex，y
                         mousey=press->pos().y();
+                        event->accept();
                         return true;
                     }
                 }
@@ -428,6 +481,8 @@ bool picture::eventFilter(QObject *obj, QEvent *event)
                 case Qt::Key_Right: nextimg();break;
                 default:return QMainWindow::eventFilter(obj,event);break;
                 }
+                event->accept();
+                return true;
             }
             else return QMainWindow::eventFilter(obj,event);
         }
@@ -441,15 +496,16 @@ bool picture::eventFilter(QObject *obj, QEvent *event)
                     int degrees=e->delta();//上为正，下为负
                     if(degrees>0)
                     {
-                        scale+=10;
+                        scale+=5;
                         if(scale>300) scale=300;
                     }
                     else{
-                        scale-=10;
+                        scale-=5;
                         if(scale<10) scale=10;
                     }
                     toscale();
                     event->accept();
+                    return true;
                 }
                 else
                 {
@@ -460,6 +516,8 @@ bool picture::eventFilter(QObject *obj, QEvent *event)
                         if(!ui->menuBar->isVisible())
                         {
                             ui->menuBar->setVisible(true);
+                            event->accept();
+                            return true;
                         }
                         else return QMainWindow::eventFilter(obj,event);
 
@@ -469,6 +527,8 @@ bool picture::eventFilter(QObject *obj, QEvent *event)
                         if(ui->menuBar->isVisible())
                         {
                             ui->menuBar->setVisible(false);
+                            event->accept();
+                            return true;
                         }
                         else return QMainWindow::eventFilter(obj,event);
 
@@ -512,6 +572,9 @@ void picture::save()
     QSettings settings("LitePic","cfg");
     settings.setValue("isauto", ui->action_4->isChecked());
     settings.setValue("size", this->size());
+    settings.setValue("rotateed", rotateed);
+    settings.setValue("mod", mod);
+
     qDebug()<<"savecfged";
 
 }
@@ -536,26 +599,38 @@ void picture::read()
     int x=QApplication::desktop()->width()/2-s.width()/2;
     int y=QApplication::desktop()->height()/2-s.height()/2;
     setGeometry(x , y , s.width() , s.height() );
+    rotateed  = settings.value("rotateed", false).toBool();
 
+    ui->action_lock->setChecked(rotateed);
+
+    mod = settings.value("mod", 0).toInt();
+    switch(mod)
+    {
+    case 0:ui->action_width->setChecked(true);break;//会触发槽函数
+    case 1:ui->action_height->setChecked(true);break;
+    case 2:ui->action_real->setChecked(true);break;
+    }
 }
 
 void picture::on_action_9_triggered()
 {
-    QMatrix matrix;
-    matrix.rotate(90.0);
-    *pic=pic->transformed(matrix,Qt::FastTransformation);
+    degree += 90.0;//这里是翻页时用的，需要累加
+    rotate(90);//这里直接用90,;rotate别放在refresh里，否则每次refresh都会旋转。
     refresh();
 }
 
 void picture::on_action_10_triggered()
 {
-    QMatrix matrix;
-    matrix.rotate(-90.0);
-    *pic=pic->transformed(matrix,Qt::FastTransformation);
+    degree -= 90.0;//这里是翻页时用的，需要累加
+    rotate(-90);//这里直接用-90,;rotate别放在refresh里，否则每次refresh都会旋转。
     refresh();
 }
 
-
+void picture::rotate(qreal d){
+    QMatrix matrix;
+    matrix.rotate(d);
+    *pic=pic->transformed(matrix,Qt::FastTransformation);
+}
 
 void picture::dropEvent(QDropEvent *event)
 {
@@ -584,3 +659,52 @@ void picture::dragEnterEvent(QDragEnterEvent *event)
 void picture::mouseDoubleClickEvent(QMouseEvent* event){
     setfullscreen(!isFullScreen());
 }
+
+void sort(QStringList& str){
+    QString one ,sec;
+    for(int i=0;i<str.length()-1;i++)
+    {
+        for(int j=i+1 ;j<str.length();j++){
+            one = str[i];
+            sec = str[j];
+            for(int m =0,n=0 ; m<one.length() && n<sec.length() ; m++,n++){
+                QChar c1 = one.at(m);
+                QChar c2 = sec.at(n);
+                if(c1.isDigit()&&c2.isDigit()){
+                    QString a,b;
+                    for(m ;m<one.length()&&one.at(m).isDigit();m++)
+                    {
+                        a.append(one.at(m));
+                    }
+                    for(n ;n<sec.length()&&sec.at(n).isDigit();n++)
+                    {
+                        b.append(sec.at(n));
+                    }
+                    int c,d;
+                    c = a.toInt();
+                    d = b.toInt();
+                    if(c > d){
+                        str.swap(i , j);
+                    }
+                    else if(c < d) break;
+                    else if((m!=(one.length()-1))&&(n==(sec.length()-1)))
+                    {
+                        str.swap(i , j);
+                    }
+                }
+                else if(c1 > c2){
+                    str.swap(i , j);
+                }
+                else if(c1 < c2) break;
+            }
+        }
+    }
+}
+
+
+void picture::on_action_lock_toggled(bool checked)
+{
+    rotateed = checked;
+}
+
+

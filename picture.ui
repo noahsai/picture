@@ -248,7 +248,7 @@ QPushButton:checked
      <x>0</x>
      <y>0</y>
      <width>556</width>
-     <height>24</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -258,12 +258,15 @@ QPushButton:checked
     <addaction name="action"/>
    </widget>
    <widget class="QMenu" name="menu_2">
+    <property name="tearOffEnabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>显示</string>
     </property>
-    <addaction name="action_3"/>
-    <addaction name="action_5"/>
-    <addaction name="action_6"/>
+    <addaction name="action_width"/>
+    <addaction name="action_height"/>
+    <addaction name="action_real"/>
     <addaction name="action_2"/>
    </widget>
    <widget class="QMenu" name="menu_3">
@@ -297,6 +300,7 @@ QPushButton:checked
     </property>
     <addaction name="action_9"/>
     <addaction name="action_10"/>
+    <addaction name="action_lock"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -309,17 +313,26 @@ QPushButton:checked
     <string>打开</string>
    </property>
   </action>
-  <action name="action_3">
+  <action name="action_width">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>界面等宽</string>
    </property>
   </action>
-  <action name="action_5">
+  <action name="action_height">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>界面等高</string>
    </property>
   </action>
-  <action name="action_6">
+  <action name="action_real">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>实际大小</string>
    </property>
@@ -403,6 +416,14 @@ QPushButton:checked
   <action name="action_11">
    <property name="text">
     <string>自动切换需额外滚动4次</string>
+   </property>
+  </action>
+  <action name="action_lock">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>锁定旋转</string>
    </property>
   </action>
  </widget>

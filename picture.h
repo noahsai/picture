@@ -19,6 +19,8 @@
 #include<QDragEnterEvent>
 #include<QSettings>
 #include<QDesktopWidget>
+#include<QMimeDatabase>
+
 namespace Ui {
 class picture;
 }
@@ -48,9 +50,6 @@ private slots:
     void timeout();
 
     void on_action_triggered();
-    void on_action_3_triggered();
-    void on_action_5_triggered();
-    void on_action_6_triggered();
 
     void on_action_2_triggered();
 
@@ -68,6 +67,15 @@ private slots:
     void dragEnterEvent(QDragEnterEvent *event);//配套使用
     void mouseDoubleClickEvent(QMouseEvent* event);
 
+
+    void on_action_lock_toggled(bool checked);
+
+    void on_action_width_toggled(bool arg1);
+
+    void on_action_height_toggled(bool arg1);
+
+    void on_action_real_toggled(bool arg1);
+
 private:
     Ui::picture *ui;
     QImage *pic;
@@ -78,6 +86,7 @@ private:
     void resizeEvent(QResizeEvent *even);
     void wheelEvent(QWheelEvent*);
     bool eventFilter(QObject *, QEvent *);
+    void rotate(qreal);
 //    void keyPressEvent(QKeyEvent *);
     QStringList list;
     int position;
@@ -86,8 +95,13 @@ private:
     int upcount,downcount;
     bool mousepress;
     int scale;
-    QImage* imgScaled;
+    QImage imgScaled;
     QTimer timer;
+    qreal degree;
+    bool rotateed;
+    bool isresize;
+
+
 };
 
 #endif // PICTURE_H
