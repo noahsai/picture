@@ -422,121 +422,125 @@ void picture::timeout(){
 bool picture::eventFilter(QObject *obj, QEvent *event)
 {
 //    qDebug()<<obj<<event;
-        if(pic)
+    if(obj==ui->widget) {
+        if(event->type()==QEvent::Enter ){
+//                    qDebug()<<"enter";
+            QGraphicsOpacityEffect *m_pGraphicsOpacityEffect = new QGraphicsOpacityEffect(this);
+            ui->widget->setGraphicsEffect(m_pGraphicsOpacityEffect );
+            m_pGraphicsOpacityEffect ->setOpacity(1.0);
+        }
+        else if(event->type()==QEvent::Leave ){
+            //qDebug()<<"leave";
+            QGraphicsOpacityEffect *m_pGraphicsOpacityEffect = new QGraphicsOpacityEffect(this);
+                ui->widget->setGraphicsEffect(m_pGraphicsOpacityEffect );
+                m_pGraphicsOpacityEffect ->setOpacity(0);
+        }
+    }
+    //上面的不要return！！否则无法执行下面的代码。
+    if(pic)
+    {
+        if(obj==ui->scrollArea )
         {
-            if(obj==ui->scrollArea )
+            QMouseEvent *press=static_cast<QMouseEvent*>(event);
+
+            //qDebug()<<"....";
+            if(event->type()==QEvent::MouseButtonPress )
             {
-                QMouseEvent *press=static_cast<QMouseEvent*>(event);
+                ui->listWidget->hide();
+               mousex=press->pos().x();
+               mousey=press->pos().y();
+               mousepress=true;
+               setCursor(Qt::OpenHandCursor);
+               event->accept();
+               return true;
 
-                //qDebug()<<"....";
-                if(event->type()==QEvent::MouseButtonPress )
-                {
-                    ui->listWidget->hide();
-                   mousex=press->pos().x();
-                   mousey=press->pos().y();
-                   mousepress=true;
-                   setCursor(Qt::OpenHandCursor);
-                   event->accept();
-                   return true;
-
-                }
-                else if(event->type()==QEvent::MouseButtonRelease)
-                {
-                   mousepress=false;
-                   setCursor(Qt::ArrowCursor);
-                   event->accept();
-                   return true;
-
-                }
-                else if(event->type()==QEvent::MouseMove)
-                {
-                    //qDebug()<<"move";
-                    if(mousepress)
-                    {
-                        setCursor(Qt::ClosedHandCursor);
-                        if(ui->scrollArea->verticalScrollBar()->isVisible()||ui->scrollArea->horizontalScrollBar()->isVisible())
-                        {
-                            int y=ui->scrollArea->verticalScrollBar()->value();
-                            int x=ui->scrollArea->horizontalScrollBar()->value();
-                            y+=-(press->pos().y()-mousey);
-                            x+=-(press->pos().x()-mousex);
-
-                            ui->scrollArea->verticalScrollBar()->setValue(y);
-                            ui->scrollArea->horizontalScrollBar()->setValue(x);
-
-                            mousex=press->pos().x();//移动中不断刷新mousex，y
-                            mousey=press->pos().y();
-                            event->accept();
-                            return true;
-                        }
-                    }
-                }
-                else if(event->type()==QEvent::KeyPress)
-                {
-                    QKeyEvent *e=static_cast<QKeyEvent*>(event);
-                    switch(e->key())
-                    {
-                    case Qt::Key_F11: setfullscreen(!isFullScreen());break;
-                    case Qt::Key_Escape: setfullscreen(false);break;
-                    case Qt::Key_Up:
-                    case Qt::Key_Left: previmg();break;
-                    case Qt::Key_Down:
-                    case Qt::Key_Right: nextimg();break;
-                    default:return QMainWindow::eventFilter(obj,event);break;
-                    }
-                    event->accept();
-                    return true;
-                }
-                else {
-                    return QMainWindow::eventFilter(obj,event);
-
-                }            }
-            else if(obj==ui->scrollAreaWidgetContents)
+            }
+            else if(event->type()==QEvent::MouseButtonRelease)
             {
-                if(event->type()==QEvent::Wheel)
+               mousepress=false;
+               setCursor(Qt::ArrowCursor);
+               event->accept();
+               return true;
+
+            }
+            else if(event->type()==QEvent::MouseMove)
+            {
+                //qDebug()<<"move";
+                if(mousepress)
                 {
-                    if(QApplication::keyboardModifiers() == Qt::ControlModifier)
+                    setCursor(Qt::ClosedHandCursor);
+                    if(ui->scrollArea->verticalScrollBar()->isVisible()||ui->scrollArea->horizontalScrollBar()->isVisible())
                     {
-                        QWheelEvent *e=static_cast<QWheelEvent*>(event);
-                        int degrees=e->delta();//上为正，下为负
-                        if(degrees>0)
-                        {
-                            scale+=5;
-                            if(scale>300) scale=300;
-                        }
-                        else{
-                            scale-=5;
-                            if(scale<10) scale=10;
-                        }
-                        toscale();
+                        int y=ui->scrollArea->verticalScrollBar()->value();
+                        int x=ui->scrollArea->horizontalScrollBar()->value();
+                        y+=-(press->pos().y()-mousey);
+                        x+=-(press->pos().x()-mousex);
+
+                        ui->scrollArea->verticalScrollBar()->setValue(y);
+                        ui->scrollArea->horizontalScrollBar()->setValue(x);
+
+                        mousex=press->pos().x();//移动中不断刷新mousex，y
+                        mousey=press->pos().y();
                         event->accept();
                         return true;
                     }
-
-                }
-
-                else {
-                    return QMainWindow::eventFilter(obj,event);
                 }
             }
-            else if(obj==ui->widget) {
-                if(event->type()==QEvent::Enter ){
-//                    qDebug()<<"enter";
-                    QGraphicsOpacityEffect *m_pGraphicsOpacityEffect = new QGraphicsOpacityEffect(this);
-                    ui->widget->setGraphicsEffect(m_pGraphicsOpacityEffect );
-                    m_pGraphicsOpacityEffect ->setOpacity(1.0);
+            else if(event->type()==QEvent::KeyPress)
+            {
+                QKeyEvent *e=static_cast<QKeyEvent*>(event);
+                switch(e->key())
+                {
+                case Qt::Key_F11: setfullscreen(!isFullScreen());break;
+                case Qt::Key_Escape: setfullscreen(false);break;
+                case Qt::Key_Up:
+                case Qt::Key_Left: previmg();break;
+                case Qt::Key_Down:
+                case Qt::Key_Right: nextimg();break;
+                default:return QMainWindow::eventFilter(obj,event);break;
                 }
-                else if(event->type()==QEvent::Leave ){
-                    //qDebug()<<"leave";
-                    QGraphicsOpacityEffect *m_pGraphicsOpacityEffect = new QGraphicsOpacityEffect(this);
-                        ui->widget->setGraphicsEffect(m_pGraphicsOpacityEffect );
-                        m_pGraphicsOpacityEffect ->setOpacity(0);
+                event->accept();
+                return true;
+            }
+            else {
+                return QMainWindow::eventFilter(obj,event);
+
+            }
+        }
+        else if(obj==ui->scrollAreaWidgetContents)
+        {
+            if(event->type()==QEvent::Wheel)
+            {
+                if(QApplication::keyboardModifiers() == Qt::ControlModifier)
+                {
+                    QWheelEvent *e=static_cast<QWheelEvent*>(event);
+                    int degrees=e->delta();//上为正，下为负
+                    if(degrees>0)
+                    {
+                        scale+=5;
+                        if(scale>300) scale=300;
+                    }
+                    else{
+                        scale-=5;
+                        if(scale<10) scale=10;
+                    }
+                    toscale();
+                    event->accept();
+                    return true;
                 }
+
+            }
+
+            else {
+                return QMainWindow::eventFilter(obj,event);
             }
         }
         else {
             return QMainWindow::eventFilter(obj,event);
         }
+    }
+
+    return QMainWindow::eventFilter(obj,event);
 }
 
 void picture::on_action_2_triggered()
@@ -602,6 +606,7 @@ void picture::read()
 
 void picture::on_action_9_triggered()
 {
+    if(!pic) return;
     degree += 90.0;//这里是翻页时用的，需要累加
     rotate(90);//这里直接用90,;rotate别放在refresh里，否则每次refresh都会旋转。
     refresh();
@@ -609,6 +614,7 @@ void picture::on_action_9_triggered()
 
 void picture::on_action_10_triggered()
 {
+    if(!pic) return;
     degree -= 90.0;//这里是翻页时用的，需要累加
     rotate(-90);//这里直接用-90,;rotate别放在refresh里，否则每次refresh都会旋转。
     refresh();
