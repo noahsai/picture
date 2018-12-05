@@ -3,21 +3,53 @@
 
 void sort(QStringList& str);//文件名排序，解决自带排序出现1,10,11,2,3的问题，按1，2,3,10,11实际数字大小排序.
 
+
 picture::picture(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::picture)
 {
+    initpicture();
+}
+
+picture::picture(QWidget *parent,const QStringList& imglist) :
+    QMainWindow(parent),
+    ui(new Ui::picture)
+{
+    initpicture();
+    list=imglist;
+    openimg(list.at(0));
+
+
+}
+
+picture::picture(QWidget *parent,const QString& filename_or_dir) :
+    QMainWindow(parent),
+    ui(new Ui::picture)
+{
+    initpicture();
+    openafile(filename_or_dir);
+}
+
+void picture::initpicture(){
     ui->setupUi(this);
-    ui->scrollArea->installEventFilter(this);
+    ui->menuBar->hide();
+    ui->listWidget->hide();
+    //========
+    QGraphicsOpacityEffect *m_pGraphicsOpacityEffect = new QGraphicsOpacityEffect(this);
+    ui->widget->setGraphicsEffect(m_pGraphicsOpacityEffect );
+    m_pGraphicsOpacityEffect ->setOpacity(1.0);
+    //==========
+    ui->widget->installEventFilter(this);
+    ui->listWidget->setItemDelegate(new IconDelegate(this));
     ui->scrollAreaWidgetContents->installEventFilter(this);
-    setCentralWidget(ui->scrollArea);
+    ui->scrollArea->installEventFilter(this);
     ui->scrollArea->setLayout(ui->docklayout);
-    ui->pushButton->setVisible(false);
-    ui->pushButton_2->setVisible(false);
+    setCentralWidget(ui->scrollArea);
     mod=0;
     pic=NULL;
+    info = NULL;
     position=0;
-    all=0;
+    //all=0;
     newwidth=ui->scrollArea->width();
     newheight=ui->scrollArea->height();
     mousex=0;
@@ -31,62 +63,6 @@ picture::picture(QWidget *parent) :
     isresize = false;
     timer.setSingleShot(true);
     read();
-
-}
-
-picture::picture(QWidget *parent,const QStringList& imglist) :
-    QMainWindow(parent),
-    ui(new Ui::picture)
-{
-    ui->setupUi(this);
-    ui->scrollArea->installEventFilter(this);
-    setCentralWidget(ui->scrollArea);
-    ui->scrollArea->setLayout(ui->docklayout);
-    ui->pushButton->setVisible(false);
-    ui->pushButton_2->setVisible(false);
-    mod=0;
-    pic=NULL;
-    position=0;
-    all=0;
-    newwidth=ui->scrollArea->width();
-    newheight=ui->scrollArea->height();
-    mousex=0;
-    mousey=0;
-    mousepress=false;
-    scale=100;
-    read();
-
-    list=imglist;
-    openimg(list.at(0));
-
-
-}
-
-picture::picture(QWidget *parent,const QString& filename_or_dir) :
-    QMainWindow(parent),
-    ui(new Ui::picture)
-{
-    ui->setupUi(this);
-    ui->scrollArea->installEventFilter(this);
-    setCentralWidget(ui->scrollArea);
-    ui->scrollArea->setLayout(ui->docklayout);
-    ui->pushButton->setVisible(false);
-    ui->pushButton_2->setVisible(false);
-    mod=0;
-    pic=NULL;
-    position=0;
-    all=0;
-    newwidth=ui->scrollArea->width();
-    newheight=ui->scrollArea->height();
-    mousex=0;
-    mousey=0;
-    mousepress=false;
-    scale=100;
-    read();
-
-    openafile(filename_or_dir);
-
-
 }
 
 picture::~picture()
@@ -111,7 +87,7 @@ void picture::openafile(const QString &img)
         list.removeLast();
         QString path=list.join("/");
         getimglist(path);//里面会清空list，重置position和all
-        getposition(img);
+        getposition(img);//获取该图片在列表中的位置
         openimg(img);
     }
     else if(QFileInfo(img).isDir())
@@ -121,16 +97,19 @@ void picture::openafile(const QString &img)
     }
 }
 
-void picture::openimg(const QString& img)
+void picture::openimg(const QString& img)//调用这个时，必须确保position与img对应
 {
     if(!img.isEmpty())
     {
         if(pic == NULL) pic = new QImage;
-        QMimeDatabase db;
-        QMimeType mime = db.mimeTypeForFile(img,QMimeDatabase::MatchContent	);  //
-        QString type = mime.name().split("/").takeLast();
-                qDebug()<<"Format:"<<img<<type;
-
+        QString type = formatlist[position];
+        if( type.isEmpty() ){
+            QMimeDatabase db;
+            QMimeType mime = db.mimeTypeForFile(list.at(position),QMimeDatabase::MatchContent	);  //
+            type = mime.name().split("/").takeLast();
+            formatlist.replace(position,type);//保存已知的
+            qDebug()<<"Format:"<<img<<type;
+        }
         if(pic->load(img,type.toLatin1()))
         {
             refresh();
@@ -148,6 +127,8 @@ void picture::openimg(const QString& img)
 void picture::getimglist(const QString& path)
 {
     list.clear();
+    formatlist.clear();
+    ui->listWidget->clear();//清空！
     position = 0;
     QDirIterator someone(path,QDir::Files|QDir::NoSymLinks);
     while(someone.hasNext())
@@ -158,12 +139,14 @@ void picture::getimglist(const QString& path)
         if(fomat=="jpg"||fomat=="png"||fomat=="bmp"||fomat=="gif"||fomat=="tif"||fomat=="jpeg")
         {
             list.append(file);
+            formatlist.append(QString());
         }
     }
-    all=list.count()-1;
+    //all=list.count()-1;
     //list.sort();
     sort(list);
-    qDebug()<<list;
+
+    //qDebug()<<list;
 }
 void picture::getposition(const QString& img)
 {
@@ -188,11 +171,11 @@ void picture::on_action_width_toggled(bool arg1)
 
     if(pic)
     {
+        //注意：窗口大小为某个范围时会出现黑边的问题不用解决了,有进度条时height不足以产生进度条，死循环来的。
         imgScaled = pic->scaled(newwidth,pic->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
-        //qDebug()<<imgScaled->height()<<newheight<<pic->height();
+        //qDebug()<<imgScaled.height()<<newheight<<pic->height();
         if(imgScaled.height()>newheight)
         {
-            scale = (newwidth- ui->scrollArea->verticalScrollBar()->width())*100/pic->width();//记录已缩放程度
             imgScaled = pic->scaled(newwidth- ui->scrollArea->verticalScrollBar()->width(),pic->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
         }
         ui->label->setPixmap(QPixmap::fromImage(imgScaled));
@@ -215,9 +198,10 @@ void picture::on_action_height_toggled(bool arg1)
 
     if(pic)
     {
+        //注意：窗口大小为某个范围时会出现黑边的问题不用解决了,有进度条时width不足以产生进度条，死循环来的。
         imgScaled = pic->scaled(pic->width(),newheight,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-        //qDebug()<<imgScaled->width()<<newwidth<<pic->width();
-        if(imgScaled.width()>newwidth)
+        //qDebug()<<imgScaled.width()<<imgScaled.height()<<newwidth<<newheight<<pic->width()<<pic->height();
+        if(imgScaled.width()> newwidth )
         {
             imgScaled = pic->scaled(pic->width(),newheight-ui->scrollArea->horizontalScrollBar()->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
         }
@@ -275,6 +259,8 @@ void picture::refresh()
     default:break;
     }
     setWindowTitle(list.at(position).split("/").last());
+    if(info != NULL && info->isVisible()) fileinfo();
+
 }
 void picture::wheelEvent(QWheelEvent* event)
 {
@@ -288,7 +274,7 @@ void picture::wheelEvent(QWheelEvent* event)
                 if(ui->scrollArea->verticalScrollBar()->isVisible())
                 {
                     upcount++;
-                    if(upcount==4) {
+                    if(upcount==3) {
                         previmg();
                         upcount=0;
                     }
@@ -307,7 +293,7 @@ void picture::wheelEvent(QWheelEvent* event)
                 if(ui->scrollArea->verticalScrollBar()->isVisible())
                 {
                     downcount++;
-                    if(downcount==4) {
+                    if(downcount==3) {
                         nextimg();
                         downcount=0;
                     }
@@ -353,27 +339,33 @@ void picture::nextimg()
 {
     if(list.count()>1)
     {
-        if(position<all)
+        if(position<list.length()-1)
         {
             position++;
         }
-        else if(position==all){
+        else {
             position=0;
-
         }
-        else return;
-
-        QMimeDatabase db;
-        QMimeType mime = db.mimeTypeForFile(list.at(position),QMimeDatabase::MatchContent	);  //
-        QString type = mime.name().split("/").takeLast();
-        qDebug()<<"Format:"<<img<<type;
-
+        QString type = formatlist[position];
+        if( type.isEmpty() ){
+            QMimeDatabase db;
+            QMimeType mime = db.mimeTypeForFile(list.at(position),QMimeDatabase::MatchContent	);  //
+            type = mime.name().split("/").takeLast();
+            formatlist.replace(position,type);//保存已知的
+            //qDebug()<<"Format:"<<list.at(position)<<type;
+        }
         pic->load(list.at(position),type.toLatin1());
         if(rotateed && (degree!=0.0)){
             rotate(degree);
         }
         refresh();
         ui->scrollArea->verticalScrollBar()->setValue(0);
+        if(ui->listWidget->isVisible()) {
+            int n = position-(ui->listWidget->width()/2/80);
+            if(n<0) n=0;
+            ui->listWidget->horizontalScrollBar()->setValue(n*80);
+            ui->listWidget->item(position)->setSelected(true);
+        }
     }
 }
 
@@ -385,23 +377,31 @@ void picture::previmg()
         {
             position--;
         }
-        else if(position==0) {
-            position=all;
+        else  {
+            position=list.length()-1;
         }
-        else return;
-
-        QMimeDatabase db;
-        QMimeType mime = db.mimeTypeForFile(list.at(position),QMimeDatabase::MatchContent	);  //
-        QString type = mime.name().split("/").takeLast();
-        qDebug()<<"Format:"<<img<<type;
-
+        QString type = formatlist[position];
+        if( type.isEmpty() ){
+            QMimeDatabase db;
+            QMimeType mime = db.mimeTypeForFile(list.at(position),QMimeDatabase::MatchContent	);  //
+            type = mime.name().split("/").takeLast();
+            formatlist.replace(position,type);//保存已知的
+            //qDebug()<<"Format:"<<list.at(position)<<type;
+        }
         pic->load(list.at(position),type.toLatin1());
         if(rotateed && (degree!=0.0)){
             rotate(degree);
         }
         refresh();
+        if(ui->listWidget->isVisible()){
+            int n = position-(ui->listWidget->width()/2/80);
+            if(n<0) n=0;
+            ui->listWidget->horizontalScrollBar()->setValue(n*80);
+            ui->listWidget->item(position)->setSelected(true);
+        }
     }
 }
+
 
 void picture::toscale()
 {
@@ -421,125 +421,122 @@ void picture::timeout(){
 
 bool picture::eventFilter(QObject *obj, QEvent *event)
 {
-
-    if(pic)
-    {
-        if(obj==ui->scrollArea)
+//    qDebug()<<obj<<event;
+        if(pic)
         {
-            if(event->type()==QEvent::MouseButtonPress)
+            if(obj==ui->scrollArea )
             {
-               QMouseEvent *press=static_cast<QMouseEvent*>(event);
-               mousex=press->pos().x();
-               mousey=press->pos().y();
-               mousepress=true;
-               setCursor(Qt::OpenHandCursor);
-               event->accept();
-               return true;
+                QMouseEvent *press=static_cast<QMouseEvent*>(event);
 
-            }
-            else if(event->type()==QEvent::MouseButtonRelease)
-            {
-               mousepress=false;
-               setCursor(Qt::ArrowCursor);
-               event->accept();
-               return true;
-
-            }
-            else if(event->type()==QEvent::MouseMove)
-            {
-                if(mousepress)
+                //qDebug()<<"....";
+                if(event->type()==QEvent::MouseButtonPress )
                 {
-                    setCursor(Qt::ClosedHandCursor);
-                    QMouseEvent *press=static_cast<QMouseEvent*>(event);
-                    if(ui->scrollArea->verticalScrollBar()->isVisible()||ui->scrollArea->horizontalScrollBar()->isVisible())
+                    ui->listWidget->hide();
+                   mousex=press->pos().x();
+                   mousey=press->pos().y();
+                   mousepress=true;
+                   setCursor(Qt::OpenHandCursor);
+                   event->accept();
+                   return true;
+
+                }
+                else if(event->type()==QEvent::MouseButtonRelease)
+                {
+                   mousepress=false;
+                   setCursor(Qt::ArrowCursor);
+                   event->accept();
+                   return true;
+
+                }
+                else if(event->type()==QEvent::MouseMove)
+                {
+                    //qDebug()<<"move";
+                    if(mousepress)
                     {
-                        int y=ui->scrollArea->verticalScrollBar()->value();
-                        int x=ui->scrollArea->horizontalScrollBar()->value();
-                        y+=-(press->pos().y()-mousey);
-                        x+=-(press->pos().x()-mousex);
+                        setCursor(Qt::ClosedHandCursor);
+                        if(ui->scrollArea->verticalScrollBar()->isVisible()||ui->scrollArea->horizontalScrollBar()->isVisible())
+                        {
+                            int y=ui->scrollArea->verticalScrollBar()->value();
+                            int x=ui->scrollArea->horizontalScrollBar()->value();
+                            y+=-(press->pos().y()-mousey);
+                            x+=-(press->pos().x()-mousex);
 
-                        ui->scrollArea->verticalScrollBar()->setValue(y);
-                        ui->scrollArea->horizontalScrollBar()->setValue(x);
+                            ui->scrollArea->verticalScrollBar()->setValue(y);
+                            ui->scrollArea->horizontalScrollBar()->setValue(x);
 
-                        mousex=press->pos().x();//移动中不断刷新mousex，y
-                        mousey=press->pos().y();
-                        event->accept();
-                        return true;
+                            mousex=press->pos().x();//移动中不断刷新mousex，y
+                            mousey=press->pos().y();
+                            event->accept();
+                            return true;
+                        }
                     }
                 }
-            }
-            else if(event->type()==QEvent::KeyPress)
-            {
-                QKeyEvent *e=static_cast<QKeyEvent*>(event);
-                switch(e->key())
+                else if(event->type()==QEvent::KeyPress)
                 {
-                case Qt::Key_F11: setfullscreen(!isFullScreen());break;
-                case Qt::Key_Escape: setfullscreen(false);break;
-                case Qt::Key_Up:
-                case Qt::Key_Left: previmg();break;
-                case Qt::Key_Down:
-                case Qt::Key_Right: nextimg();break;
-                default:return QMainWindow::eventFilter(obj,event);break;
-                }
-                event->accept();
-                return true;
-            }
-            else return QMainWindow::eventFilter(obj,event);
-        }
-        else if(obj==ui->scrollAreaWidgetContents)
-        {
-            if(event->type()==QEvent::Wheel)
-            {
-                if(QApplication::keyboardModifiers() == Qt::ControlModifier)
-                {
-                    QWheelEvent *e=static_cast<QWheelEvent*>(event);
-                    int degrees=e->delta();//上为正，下为负
-                    if(degrees>0)
+                    QKeyEvent *e=static_cast<QKeyEvent*>(event);
+                    switch(e->key())
                     {
-                        scale+=5;
-                        if(scale>300) scale=300;
+                    case Qt::Key_F11: setfullscreen(!isFullScreen());break;
+                    case Qt::Key_Escape: setfullscreen(false);break;
+                    case Qt::Key_Up:
+                    case Qt::Key_Left: previmg();break;
+                    case Qt::Key_Down:
+                    case Qt::Key_Right: nextimg();break;
+                    default:return QMainWindow::eventFilter(obj,event);break;
                     }
-                    else{
-                        scale-=5;
-                        if(scale<10) scale=10;
-                    }
-                    toscale();
                     event->accept();
                     return true;
                 }
-                else
+                else {
+                    return QMainWindow::eventFilter(obj,event);
+
+                }            }
+            else if(obj==ui->scrollAreaWidgetContents)
+            {
+                if(event->type()==QEvent::Wheel)
                 {
-                    QWheelEvent *e=static_cast<QWheelEvent*>(event);
-                    int degrees=e->delta();//上为正，下为负
-                    if(degrees>0)
+                    if(QApplication::keyboardModifiers() == Qt::ControlModifier)
                     {
-                        if(!ui->menuBar->isVisible())
+                        QWheelEvent *e=static_cast<QWheelEvent*>(event);
+                        int degrees=e->delta();//上为正，下为负
+                        if(degrees>0)
                         {
-                            ui->menuBar->setVisible(true);
-                            event->accept();
-                            return true;
+                            scale+=5;
+                            if(scale>300) scale=300;
                         }
-                        else return QMainWindow::eventFilter(obj,event);
-
-                    }
-                    else
-                    {
-                        if(ui->menuBar->isVisible())
-                        {
-                            ui->menuBar->setVisible(false);
-                            event->accept();
-                            return true;
+                        else{
+                            scale-=5;
+                            if(scale<10) scale=10;
                         }
-                        else return QMainWindow::eventFilter(obj,event);
-
+                        toscale();
+                        event->accept();
+                        return true;
                     }
+
+                }
+
+                else {
+                    return QMainWindow::eventFilter(obj,event);
                 }
             }
-
-            else return QMainWindow::eventFilter(obj,event);
+            else if(obj==ui->widget) {
+                if(event->type()==QEvent::Enter ){
+//                    qDebug()<<"enter";
+                    QGraphicsOpacityEffect *m_pGraphicsOpacityEffect = new QGraphicsOpacityEffect(this);
+                    ui->widget->setGraphicsEffect(m_pGraphicsOpacityEffect );
+                    m_pGraphicsOpacityEffect ->setOpacity(1.0);
+                }
+                else if(event->type()==QEvent::Leave ){
+                    //qDebug()<<"leave";
+                    QGraphicsOpacityEffect *m_pGraphicsOpacityEffect = new QGraphicsOpacityEffect(this);
+                        ui->widget->setGraphicsEffect(m_pGraphicsOpacityEffect );
+                        m_pGraphicsOpacityEffect ->setOpacity(0);
+                }
+            }
         }
-    }
-    else return QMainWindow::eventFilter(obj,event);
+        else {
+            return QMainWindow::eventFilter(obj,event);
+        }
 }
 
 void picture::on_action_2_triggered()
@@ -559,11 +556,6 @@ void picture::on_pushButton_2_clicked()
 
 void picture::on_action_4_triggered(bool checked)
 {
-    if(pic)
-    {
-        ui->pushButton->setVisible(!checked);
-        ui->pushButton_2->setVisible(!checked);
-    }
     save();
 }
 
@@ -585,15 +577,11 @@ void picture::read()
     isauto = settings.value("isauto", isauto).toBool();
     if(isauto){
         ui->action_4->setChecked(true);
-        ui->pushButton->setVisible(false);
-        ui->pushButton_2->setVisible(false);
 
     }
     else
     {
         ui->action_4->setChecked(false);
-        ui->pushButton->setVisible(true);
-        ui->pushButton_2->setVisible(true);
     }
     QSize s = settings.value("size", QSize(550, 450)).toSize();
     int x=QApplication::desktop()->width()/2-s.width()/2;
@@ -658,6 +646,7 @@ void picture::dragEnterEvent(QDragEnterEvent *event)
 
 void picture::mouseDoubleClickEvent(QMouseEvent* event){
     setfullscreen(!isFullScreen());
+    event->accept();
 }
 
 void sort(QStringList& str){
@@ -707,4 +696,146 @@ void picture::on_action_lock_toggled(bool checked)
     rotateed = checked;
 }
 
+void picture:: openpath(){
+    QProcess pro;
+    QString path = list[position];
+    path = path.remove(QRegularExpression("/[^/]+$"));
+    QString cmd = "xdg-open \""+ path +"\"";
+    pro.startDetached(cmd);
+}
 
+void picture:: delfile(){
+    if(position == -1 ) {
+        QMessageBox::warning(this,"没图片了","该文件夹已经没有图片了。");
+        return;
+    }
+    int result;
+    result = QMessageBox::question(this,"删除图片？","删除\n["+list[position]+"]\n后将无法恢复!\n您确定要删除？","否","是");
+    if (result!=0) {
+        QFile file(list[position]);
+        if(file.remove()){
+            list.removeAt(position);
+            //all = list.length()-1;
+            formatlist.removeAt(position);
+            ui->listWidget->takeItem(position);
+            if(list.length() == position) position = (list.length()-1);
+            if(list.length() == 0) QMessageBox::warning(this,"没图片了","该文件夹已经没有图片了。");
+            else openimg(list[position]);
+        }
+    }
+}
+
+void picture:: fileinfo(){
+    if(position == -1 ) {
+        QMessageBox::warning(this,"没图片了","该文件夹已经没有图片了。");
+        return;
+    }
+    if(info == NULL)    info = new QLabel(this);
+    info->setWordWrap(true);
+    info->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    info->setWindowTitle("图片信息");
+    QString text = "文件名：" + QString(list[position]).split("/").last() + "\n";
+    text += "格式：" +ui->label->whatsThis()+ "\n";
+    text += "分辨率：" + QString().setNum( pic->width()) + "×" + QString().setNum(pic->height()) + "\n";
+    text += "偏移：" + QString().setNum( pic->offset().x())+"," +QString().setNum( pic->offset().y())+ "\n";
+    QString alp = pic->hasAlphaChannel()?"是":"否" ;
+    text += "Alpha通道：" + alp + "\n";
+    text += "大小：" + QString().setNum(QFile(list[position]).size()/1024.0) + "KB\n";
+    QFileInfo i(list[position]);
+    text += "创建：" + i.created().toString("yyyy-MM-dd hh:mm:ss") + "\n";
+    text += "修改：" + i.lastModified().toString("yyyy-MM-dd hh:mm:ss") + "\n";
+    text += "访问：" + i.lastRead().toString("yyyy-MM-dd hh:mm:ss") + "\n";
+    text += "路径："+list[position] ;
+
+    qDebug()<<info;
+    info->setMargin(5);
+    info->setText(text);
+    info->adjustSize();
+    info->setWindowFlags(Qt::Window);
+    info->setVisible(true);
+}
+
+void picture::on_listWidget_clicked(const QModelIndex &index)
+{
+    QString img = ui->listWidget->item(index.row())->data(Qt::UserRole).toString();
+    getposition(img);//设置position
+    openimg(img);
+}
+
+void picture::on_openfile_clicked()
+{
+    on_action_triggered();
+}
+
+void picture::on_width_clicked()
+{
+    ui->action_width->setChecked(true);
+}
+
+void picture::on_height_clicked()
+{
+    ui->action_height->setChecked(true);
+}
+
+void picture::on_real_clicked()
+{
+    ui->action_real->setChecked(true);
+}
+
+void picture::on_full_clicked()
+{
+    on_action_2_triggered();
+}
+
+void picture::on_shun_clicked()
+{
+    on_action_9_triggered();
+}
+
+void picture::on_ni_clicked()
+{
+    on_action_10_triggered();
+}
+
+void picture::on_openfile_2_clicked()
+{
+    ui->menuBar->setVisible(!ui->menuBar->isVisible());
+}
+
+void picture::on_openfile_3_clicked()
+{
+    if(list.length()>0&&ui->listWidget->count()==0)
+    {
+        ui->listWidget->clear();
+        for(int i=0;i<list.length();i++)
+        {
+            QListWidgetItem *item = new QListWidgetItem(ui->listWidget);
+            item->setIcon(QIcon(list[i]));
+            item->setSizeHint(QSize(80,100));
+            item->setData(Qt::DecorationRole,QVariant(item->icon()));
+            item->setData(Qt::UserRole,QString(list[i]));
+        }
+    }
+    ui->listWidget->setVisible(!ui->listWidget->isVisible());
+}
+
+void picture::contextMenuEvent(QContextMenuEvent *event){
+    if(!pic) return;
+    //qDebug()<<event->pos()<<ui->scrollArea->pos()<<event->globalPos();
+    if(event->pos().x()<ui->scrollArea->pos().x() ||event->pos().y()<ui->scrollArea->pos().y() ) return;
+    QMenu *pMenu = new QMenu(this);
+    QAction *pAddGroupAct = new QAction(tr("打开文件位置"), pMenu);
+    connect(pAddGroupAct ,SIGNAL(triggered(bool)),this,SLOT(openpath()) );
+    pMenu->addAction(pAddGroupAct);
+    pMenu->addSeparator();
+    pAddGroupAct = new QAction(tr("删除"), pMenu);
+    connect(pAddGroupAct ,SIGNAL(triggered(bool)),this,SLOT(delfile()) );
+    pMenu->addAction(pAddGroupAct);
+    pMenu->addSeparator();
+    pAddGroupAct = new QAction(tr("属性"), pMenu);
+    connect(pAddGroupAct ,SIGNAL(triggered(bool)),this,SLOT(fileinfo()) );
+    pMenu->addAction(pAddGroupAct);
+
+    pMenu->popup(cursor().pos());
+    event->accept();
+}

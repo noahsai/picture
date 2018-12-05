@@ -25,8 +25,8 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>86</width>
-      <height>41</height>
+      <width>401</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="acceptDrops">
@@ -37,6 +37,9 @@
     </property>
     <property name="frameShape">
      <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="lineWidth">
+     <number>0</number>
     </property>
     <property name="widgetResizable">
      <bool>true</bool>
@@ -49,8 +52,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>86</width>
-       <height>41</height>
+       <width>401</width>
+       <height>61</height>
       </rect>
      </property>
      <property name="acceptDrops">
@@ -100,13 +103,16 @@ background-color:qlineargradient(spread:pad, x1:0.567568, y1:1, x2:1, y2:0, stop
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>120</y>
-      <width>321</width>
-      <height>231</height>
+      <x>10</x>
+      <y>100</y>
+      <width>940</width>
+      <height>311</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="docklayout">
+     <property name="spacing">
+      <number>3</number>
+     </property>
      <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
@@ -121,123 +127,440 @@ background-color:qlineargradient(spread:pad, x1:0.567568, y1:1, x2:1, y2:0, stop
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <spacer name="horizontalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="minimumSize">
-          <size>
-           <width>40</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::TabFocus</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton
-{	
-background-color:  rgba(135, 175, 255, 50);
-border-radius:20px;
-padding:2px;
-color:rgba(255,255,255,150);
-font:bold;
-}
-QPushButton:hover
-{	
-background-color: rgba(135, 175, 255,200);
-color:white;
-}
-QPushButton:checked
-{	
-	background-color: rgba(135, 175, 255,200);
-}</string>
-         </property>
-         <property name="text">
-          <string>&lt;</string>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="minimumSize">
-          <size>
-           <width>40</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::TabFocus</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton
-{	
-background-color:  rgba(135, 175, 255, 50);
-border-radius:20px;
-padding:2px;
-color:rgba(255,255,255,150);
-font:bold;
-}
-QPushButton:hover
-{	
-background-color: rgba(135, 175, 255,200);
-color:white;
-}
-QPushButton:checked
-{	
-	background-color: rgba(135, 175, 255,200);
-}</string>
-         </property>
-         <property name="text">
-          <string>&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      <widget class="QWidget" name="widget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
+       <property name="minimumSize">
         <size>
-         <width>20</width>
-         <height>4</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
-      </spacer>
+       <property name="styleSheet">
+        <string notr="true">
+QPushButton
+{	
+max-width:30px;
+max-height:30px;
+min-width:30px;
+min-height:30px;
+background-color:  rgba(135, 175, 255, 200);
+border-radius:15px;
+padding:2px;
+color:rgba(255,255,255,255);
+font:bold;
+}
+
+#pushButton,#pushButton_2
+{	
+max-width:40px;
+max-height:40px;
+min-width:40px;
+min-height:40px;
+background-color:  rgba(135, 175, 255, 200);
+border-radius:20px;
+padding:2px;
+color:rgba(255,255,255,255);
+font:bold;
+}
+
+
+QPushButton:hover,
+#pushButton:hover,#pushButton_2:hover
+{	
+background-color: rgba(135, 175, 255,255);
+color:white;
+}
+QPushButton:checked,
+#pushButton:checked,#pushButton_2:checked
+{	
+	background-color: rgba(135, 175, 255,255);
+}</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="spacing">
+         <number>3</number>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>3</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>20</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="spacing">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QListWidget" name="listWidget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="verticalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QAbstractScrollArea::AdjustIgnored</enum>
+            </property>
+            <property name="autoScroll">
+             <bool>true</bool>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
+            <property name="dragDropMode">
+             <enum>QAbstractItemView::NoDragDrop</enum>
+            </property>
+            <property name="defaultDropAction">
+             <enum>Qt::IgnoreAction</enum>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::SingleSelection</enum>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>80</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="textElideMode">
+             <enum>Qt::ElideRight</enum>
+            </property>
+            <property name="movement">
+             <enum>QListView::Static</enum>
+            </property>
+            <property name="flow">
+             <enum>QListView::LeftToRight</enum>
+            </property>
+            <property name="isWrapping" stdset="0">
+             <bool>false</bool>
+            </property>
+            <property name="resizeMode">
+             <enum>QListView::Fixed</enum>
+            </property>
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <property name="viewMode">
+             <enum>QListView::IconMode</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="spacing">
+             <number>3</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="openfile">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>打开文件</string>
+              </property>
+              <property name="text">
+               <string>△</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="width">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>等宽</string>
+              </property>
+              <property name="text">
+               <string>⇆</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="height">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>等高</string>
+              </property>
+              <property name="text">
+               <string>⇅</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="real">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>实际大小</string>
+              </property>
+              <property name="text">
+               <string>▩</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="full">
+              <property name="minimumSize">
+               <size>
+                <width>34</width>
+                <height>34</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>全屏</string>
+              </property>
+              <property name="text">
+               <string>▣</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="text">
+               <string>&lt;</string>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="text">
+               <string>&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="shun">
+              <property name="minimumSize">
+               <size>
+                <width>34</width>
+                <height>34</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>顺时针</string>
+              </property>
+              <property name="text">
+               <string>↷</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="ni">
+              <property name="minimumSize">
+               <size>
+                <width>34</width>
+                <height>34</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>逆时针</string>
+              </property>
+              <property name="text">
+               <string>↶</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="openfile_2">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>菜单栏</string>
+              </property>
+              <property name="text">
+               <string>≣</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="openfile_3">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>菜单栏</string>
+              </property>
+              <property name="text">
+               <string>▲</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -248,8 +571,14 @@ QPushButton:checked
      <x>0</x>
      <y>0</y>
      <width>556</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
+   </property>
+   <property name="defaultUp">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -355,7 +684,7 @@ QPushButton:checked
   </action>
   <action name="action_7">
    <property name="text">
-    <string>← - 上一张</string>
+    <string>上一张 (←)</string>
    </property>
    <property name="menuRole">
     <enum>QAction::TextHeuristicRole</enum>
@@ -369,17 +698,17 @@ QPushButton:checked
   </action>
   <action name="action_8">
    <property name="text">
-    <string>→ - 下一张</string>
+    <string>下一张 (→)</string>
    </property>
   </action>
   <action name="actionF11">
    <property name="text">
-    <string>F11/双击 - 全屏切换</string>
+    <string>全屏切换 (F11/双击)</string>
    </property>
   </action>
   <action name="actionCTRL">
    <property name="text">
-    <string>CTRL+滚轮 - 缩放</string>
+    <string>缩放 (CTRL+滚轮)</string>
    </property>
   </action>
   <action name="action_9">
@@ -405,7 +734,7 @@ QPushButton:checked
   </action>
   <action name="actionNoahsai_github_io_2">
    <property name="text">
-    <string>noahsai.github.io</string>
+    <string>https://noahsai.github.io</string>
    </property>
   </action>
   <action name="actionGithub_com_noahsai">
@@ -415,7 +744,7 @@ QPushButton:checked
   </action>
   <action name="action_11">
    <property name="text">
-    <string>自动切换需额外滚动4次</string>
+    <string>自动切换需额外滚动3次</string>
    </property>
   </action>
   <action name="action_lock">

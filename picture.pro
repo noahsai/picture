@@ -13,9 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        picture.cpp
+        picture.cpp \
+    icondelegate.cpp
 
-HEADERS  += picture.h
+HEADERS  += picture.h \
+    icondelegate.h
 
 FORMS    += picture.ui
 
