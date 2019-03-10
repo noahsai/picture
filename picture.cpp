@@ -113,6 +113,7 @@ void picture::openimg(const QString& img)//调用这个时，必须确保positio
         if(pic->load(img,type.toLatin1()))
         {
             refresh();
+            if(!ui->listWidget->isHidden()) on_preview_clicked();
         }
         else
         {
@@ -120,7 +121,6 @@ void picture::openimg(const QString& img)//调用这个时，必须确保positio
             qDebug()<<"open error"<<img;
         }
         ui->scrollArea->setLayout(ui->docklayout);
-
     }
 }
 
@@ -548,18 +548,19 @@ void picture::on_action_2_triggered()
     setfullscreen(!isFullScreen());
 }
 
-void picture::on_pushButton_clicked()
+void picture::on_pre_clicked()
 {
     previmg();
 }
 
-void picture::on_pushButton_2_clicked()
+void picture::on_next_clicked()
 {
     nextimg();
 }
 
 void picture::on_action_4_triggered(bool checked)
 {
+    changemode(checked);
     save();
 }
 
@@ -581,12 +582,12 @@ void picture::read()
     isauto = settings.value("isauto", isauto).toBool();
     if(isauto){
         ui->action_4->setChecked(true);
-
     }
     else
     {
         ui->action_4->setChecked(false);
     }
+    changemode(isauto);
     QSize s = settings.value("size", QSize(550, 450)).toSize();
     int x=QApplication::desktop()->width()/2-s.width()/2;
     int y=QApplication::desktop()->height()/2-s.height()/2;
@@ -741,7 +742,7 @@ void picture:: fileinfo(){
     info->setTextInteractionFlags(Qt::TextSelectableByMouse);
     info->setWindowTitle("图片信息");
     QString text = "文件名：" + QString(list[position]).split("/").last() + "\n";
-    text += "格式：" +ui->label->whatsThis()+ "\n";
+    text += "格式：" +formatlist[position]+ "\n";
     text += "分辨率：" + QString().setNum( pic->width()) + "×" + QString().setNum(pic->height()) + "\n";
     text += "偏移：" + QString().setNum( pic->offset().x())+"," +QString().setNum( pic->offset().y())+ "\n";
     QString alp = pic->hasAlphaChannel()?"是":"否" ;
@@ -803,12 +804,12 @@ void picture::on_ni_clicked()
     on_action_10_triggered();
 }
 
-void picture::on_openfile_2_clicked()
+void picture::on_menubar_clicked()
 {
     ui->menuBar->setVisible(!ui->menuBar->isVisible());
 }
 
-void picture::on_openfile_3_clicked()
+void picture::on_preview_clicked()
 {
     if(list.length()>0&&ui->listWidget->count()==0)
     {
@@ -844,4 +845,70 @@ void picture::contextMenuEvent(QContextMenuEvent *event){
 
     pMenu->popup(cursor().pos());
     event->accept();
+}
+
+void picture::on_changemode_clicked()
+{
+    bool b = ui->action_4->isChecked();
+    ui->action_4->setChecked(!b);
+    changemode(!b);
+}
+
+void picture::changemode(bool b){
+    if(b) {
+        ui->changemode->setText("Ⓐ");
+        ui->changemode->setToolTip("自动切换");
+    }
+    else {
+        ui->changemode->setText("Ⓗ");
+        ui->changemode->setToolTip("手动切换");
+    }
+
+}
+
+void changetheme(QString color){
+    QString button =
+            "QPushButton\
+    {	\
+    background-color:  %1;\
+    } \
+            QPushButton\
+            {	\
+            max-width:30px;\
+            max-height:30px;\
+            min-width:30px;\
+            min-height:30px;\
+            background-color:  rgba(135, 175, 255, 200);\
+            border-radius:15px;\
+            padding:2px;\
+            color:rgba(255,255,255,255);\
+            font:bold;\
+            }\
+            #pushButton,#pushButton_2\
+            {	\
+            max-width:40px;\
+            max-height:40px;\
+            min-width:40px;\
+            min-height:40px;\
+            background-color:  rgba(135, 175, 255, 200);\
+            border-radius:20px;\
+            padding:2px;\
+            color:rgba(255,255,255,255);\
+            font:bold;\
+            }\
+            \
+            QPushButton:hover,#pushButton:hover,#pushButton_2:hover\
+            {	\
+            background-color: rgba(135, 175, 255,255);\
+            color:white;\
+            }\
+            QPushButton:checked,\
+            #pushButton:checked,#pushButton_2:checked\
+            {	\
+                background-color: rgba(135, 175, 255,255);\
+            }";
+
+            QString list = "\ QListWidget   {   background-color:  %2;  }";
+
+
 }

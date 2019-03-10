@@ -61,9 +61,9 @@ private slots:
 
     void on_action_2_triggered();
 
-    void on_pushButton_clicked();
+    void on_pre_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_next_clicked();
 
     void on_action_4_triggered(bool checked);
 
@@ -100,9 +100,11 @@ private slots:
 
     void on_ni_clicked();
 
-    void on_openfile_2_clicked();
+    void on_menubar_clicked();
 
-    void on_openfile_3_clicked();
+    void on_preview_clicked();
+
+    void on_changemode_clicked();
 
 private:
     Ui::picture *ui;
@@ -117,6 +119,8 @@ private:
     bool eventFilter(QObject *, QEvent *);
     void contextMenuEvent(QContextMenuEvent *event);
     void rotate(qreal);
+    void changemode(bool);
+    void changetheme(QString color);
 //    void keyPressEvent(QKeyEvent *);
     QStringList list;
     QStringList formatlist;//必须跟list同清同增同减！
